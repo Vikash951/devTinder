@@ -12,7 +12,7 @@ profileRouter.get("/profile/view" , userAuth ,async (req , res) =>{
 
     try{
 
-        const user = req.user;
+        const user = await User.findById(req.user._id).select("firstName lastName age gender about skills")
         if(!user){
             throw new Error("user doesn't exist");
         }
