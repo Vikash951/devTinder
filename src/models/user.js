@@ -13,7 +13,8 @@ const userSchema = new mongoose.Schema({
     lastName : {
         type : String,
         minLength : 4,
-        maxLength : 50
+        maxLength : 50,
+        required:true,
     },
     emailId : {
         type : String,
@@ -38,6 +39,7 @@ const userSchema = new mongoose.Schema({
     },
     age : {
         type : Number,
+    
     },
     gender : {
         type : String,
@@ -55,13 +57,16 @@ const userSchema = new mongoose.Schema({
     },
     photoUrl : {
         type : String,
+        default : "https://th.bing.com/th/id/OIP.e1KNYwnuhNwNj7_-98yTRwHaF7?w=279&h=223&c=8&rs=1&qlt=90&o=6&dpr=1.3&pid=3.1&rm=2"
     },
     about : {
         type : String,
         default : "This is a default about of the user!",
+        
     },
     skills : {
         type : [String],
+        
     },
     
 } , {timestamps : true});

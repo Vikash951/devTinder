@@ -4,10 +4,11 @@ const connectDB = require("./config/database");
 
 //this create instance of an express application
 const app = express();
+const cors = require("cors");
 
 const cookieParser = require("cookie-parser");
 
-
+app.use(cors({origin : "http://localhost:5173" , credentials : true}));
 app.use(cookieParser());
 
 //it reads the json and concert it inot a javascript object and just adds that javascript object back

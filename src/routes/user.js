@@ -7,18 +7,25 @@ const User = require("../models/user");
 
 
 
-userRouter.get("/user/requests/received" , userAuth , async (req , res) =>{
+userRouter.get("/:userId/requests/received" , userAuth , async (req , res) =>{
     
     try{
+        if (!req.user) {
+            return res.status(401).json({ message: "Unauthorized access" });
+        }
+
         const loggedInUser = req.user;
+
+       
+
         const connectionRequests = await ConnectionRequest.find(
                 {
                     toUserId : loggedInUser._id,
                     status : "interested"
                 }
-        ).populate("fromUserId" , ["firstName" , "lastName"]);
+        ).populate("fromUserId" , ["firstName" , "lastName" , "photoUrl" , "gender" , "age" , "about" , "skills"]);
 
-        console.log(connectionRequests);
+        
 
         res.json({
             message : "Data fetched successfully" , 
@@ -26,7 +33,7 @@ userRouter.get("/user/requests/received" , userAuth , async (req , res) =>{
         })
     }
     catch(err){
-        res.status(400).send("Error" + err.message);
+        return res.status(500).json({ message: "Internal Server Error", error: err.message });
     }
 })
 
@@ -39,8 +46,8 @@ userRouter.get("/user/connections" , userAuth , async (req , res) =>{
                 {toUserId : loggedInUser._id , status : "accepted"},
                 {fromUserId : loggedInUser._id , status : "accepted"}
             ]
-        }).populate("fromUserId" , "firstName lastName")
-          .populate("toUserId" , "firstName lastName")
+        }).populate("fromUserId" , "firstName lastName gender age photoUrl about skills")
+          .populate("toUserId" , "firstName lastName gender age photoUrl about skills")
 
         const data = connectionRequests.map((row) =>{
             if(row.fromUserId._id.toString() ===  loggedInUser._id.toString()){
@@ -85,15 +92,16 @@ userRouter.get("/feed" , userAuth , async (req , res) =>{
             hideUsersFromFeed.add(req.toUserId.toString());
         })
 
+        hideUsersFromFeed.add(loggedInUser._id.toString());
+
         const users = await User.find({
-           $and: [ {_id : {$nin: Array.from(hideUsersFromFeed)},} ,
-                    {_id : {$ne : loggedInUser._id}}
-           ]
-        }).select("firstName lastName age gender about skills").skip(skip).limit(limit);
+            _id : {$nin: Array.from(hideUsersFromFeed)}
+           
+        }).select("firstName lastName age gender about skills photoUrl").skip(skip).limit(limit);
 
-       // console.log(users);
+      
 
-       // console.log(hideUsersFromFeed);
+       console.log(hideUsersFromFeed);
 
         res.send(users);
 

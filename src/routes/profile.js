@@ -8,21 +8,21 @@ const User = require("../models/user");
 
 const profileRouter = express.Router();
 
-profileRouter.get("/profile/view" , userAuth ,async (req , res) =>{
-
-    try{
-
-        const user = await User.findById(req.user._id).select("firstName lastName age gender about skills")
-        if(!user){
-            throw new Error("user doesn't exist");
-        }
+profileRouter.get("/profile/view", userAuth, async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id).select("firstName lastName age gender about skills photoUrl");
         
-        res.send( "displaying profile" + user);
+        if (!user) {
+            return res.status(404).json({ error: "User doesn't exist" });
+        }
+
+        res.json({ message: "Profile fetched successfully", user }); // ✅ Proper JSON response
+    } 
+    catch (err) {
+        res.status(400).json({ error: err.message });
     }
-    catch(err){
-        res.status(400).send("Error " + err.message);
-    }
-})
+});
+
 
 profileRouter.patch("/profile/edit" , userAuth , async ( req , res) =>{
     try{

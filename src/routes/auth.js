@@ -15,15 +15,29 @@ authRouter.post("/signup" , async (req , res) =>{
         //validation of data
         validateSignupData(req);
 
-        //encryption of password
-        const {firstName , lastName , emailId , password} = req.body;
+        // console.log(req);
+       
+        const { firstName, lastName, emailId, password, age, gender, photoUrl, about, skills } = req.body;
 
+         //encryption of password
         const passwordHash = await bcrypt.hash(password , saltRounds)
         
 
-        const user = new User({firstName , lastName ,emailId , password : passwordHash}); 
-        await user.save();
-        res.send("user added successfully");
+        const user = new User({
+            firstName,
+            lastName,
+            emailId,
+            password: passwordHash,
+            age,
+            gender,
+            photoUrl,
+            about,
+            skills
+        });
+        const savedUser = await user.save();
+        const token = await savedUser.getJWT(); 
+        res.cookie("token" , token , {expires : new Date(Date.now() + 16*3600000)});
+        res.json({message : "user added successfully", data:savedUser});
     }
     catch(err){
         res.status(404).send("error message :" + err);
@@ -36,6 +50,8 @@ authRouter.post("/login" , async (req , res) =>{
 
         const user = await User.findOne({emailId});
 
+        
+
         if(!user){
             throw new Error("Invalid credential")
         }
@@ -45,17 +61,17 @@ authRouter.post("/login" , async (req , res) =>{
         if(isPasswordValid){
 
             const token = await user.getJWT(); 
-
             res.cookie("token" , token , {expires : new Date(Date.now() + 16*3600000)});
-            res.send("login successful");
+            const sendUser =  await User.findOne({emailId}).select("firstName lastName age gender about skills photoUrl");
+            res.send(sendUser);
         }
-        else{
-            throw new Error("Invalid credential")
+        else {
+            return res.status(401).json({ message: "Invalid credentials" });
         }
 
     }
-    catch(err){
-        res.send("failure :" + err);
+    catch (err) {
+        res.status(500).json({ message: "Error: " + err.message });
     }
 })
 
