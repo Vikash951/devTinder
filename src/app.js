@@ -1,6 +1,8 @@
 //this line import express module into the file
+require("dotenv").config();
 const express = require('express');
 const connectDB = require("./config/database");
+
 
 //this create instance of an express application
 const app = express();
@@ -85,7 +87,7 @@ app.use('/' , user);
 
 connectDB()
        .then(() =>{
-            app.listen(3000 , () =>{
+            app.listen(process.env.PORT , () =>{
                 console.log("server is running successfully on port no 3000");
             })
        })

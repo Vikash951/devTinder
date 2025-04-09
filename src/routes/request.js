@@ -6,6 +6,8 @@ const { userAuth } = require("../middlewares/auth");
 const ConnectionRequest = require("../models/connectionRequest");
 const User = require("../models/user");
 
+const sendEmail = require("../utils/sendEmail")
+
 
 requestRouter.post(
   "/request/send/:status/:toUserId",
@@ -16,6 +18,7 @@ requestRouter.post(
       const toUserId = req.params.toUserId;
       const status = req.params.status;
 
+
       const allowedStatus = ["ignored", "interested"];
       if (!allowedStatus.includes(status)) {
         return res
@@ -24,6 +27,8 @@ requestRouter.post(
       }
 
       const toUser = await User.findById(toUserId);
+
+      
       if (!toUser) {
         return res.status(404).json({ message: "User not found!" });
       }
@@ -34,6 +39,8 @@ requestRouter.post(
           { fromUserId: toUserId, toUserId: fromUserId },
         ],
       });
+
+      
       if (existingConnectionRequest) {
         return res
           .status(400)
@@ -46,9 +53,17 @@ requestRouter.post(
         status,
       });
 
+      
+
       const data = await connectionRequest.save();
 
-      
+      const subject = `New Connection Request from ${req.user.firstName}`;
+const body = `${req.user.firstName} has shown ${status} in connecting with ${toUser.firstName}.`;
+
+      const emailRes = await sendEmail.run(subject, body);
+
+      //console.log(emailRes);
+     
 
       res.json({
         message:
@@ -69,7 +84,7 @@ requestRouter.post(
       const loggedInUser = req.user;
       const { status, requestId } = req.params;
 
-      //console.log(loggedInUser , status , requestId);
+      
 
       const allowedStatus = ["accepted", "rejected"];
       if (!allowedStatus.includes(status)) {
@@ -82,7 +97,7 @@ requestRouter.post(
         status: "interested",
       });
 
-      //console.log(connectionRequest);
+    
 
       if (!connectionRequest) {
         return res

@@ -14,8 +14,6 @@ authRouter.post("/signup" , async (req , res) =>{
     try{
         //validation of data
         validateSignupData(req);
-
-        // console.log(req);
        
         const { firstName, lastName, emailId, password, age, gender, photoUrl, about, skills } = req.body;
 

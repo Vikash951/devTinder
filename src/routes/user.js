@@ -99,9 +99,6 @@ userRouter.get("/feed" , userAuth , async (req , res) =>{
            
         }).select("firstName lastName age gender about skills photoUrl").skip(skip).limit(limit);
 
-      
-
-       console.log(hideUsersFromFeed);
 
         res.send(users);
 
