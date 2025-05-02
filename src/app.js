@@ -2,11 +2,16 @@
 require("dotenv").config();
 const express = require('express');
 const connectDB = require("./config/database");
+require("./utils/cronjob");
 
+const http = require("http");
+const initializeSocket = require("./utils/socket")
 
 //this create instance of an express application
 const app = express();
 const cors = require("cors");
+
+
 
 const cookieParser = require("cookie-parser");
 
@@ -77,17 +82,21 @@ const auth = require("./routes/auth");
 const profile = require('./routes/profile');
 const request = require('./routes/request');
 const user = require('./routes/user')
+const chat = require("./routes/chat")
 
 app.use("/" , auth);
 app.use('/' , profile);
 app.use('/' , request);
 app.use('/' , user);
+app.use('/' , chat)
 
-
+//for chat message
+const server = http.createServer(app);
+initializeSocket(server);
 
 connectDB()
        .then(() =>{
-            app.listen(process.env.PORT , () =>{
+            server.listen(process.env.PORT , () =>{
                 console.log("server is running successfully on port no 3000");
             })
        })

@@ -57,10 +57,10 @@ requestRouter.post(
 
       const data = await connectionRequest.save();
 
-      const subject = `New Connection Request from ${req.user.firstName}`;
-const body = `${req.user.firstName} has shown ${status} in connecting with ${toUser.firstName}.`;
+//       const subject = `New Connection Request from ${req.user.firstName}`;
+// const body = `${req.user.firstName} has shown ${status} in connecting with ${toUser.firstName}.`;
 
-      const emailRes = await sendEmail.run(subject, body);
+//       const emailRes = await sendEmail.run(subject, body);
 
       //console.log(emailRes);
      
